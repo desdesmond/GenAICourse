@@ -10,6 +10,43 @@ We need to train a sequence Classification model and not a Causal LM .
 While I find the steps to be almost correct, I feel changing to Sequence Classification would make the project complete.
 
 Also you should compare the pre trained hugging model post loading directly and not use trainer.train() on pre trained model.
+	# Try the following block:
+# Estimate the accuracy of your classifier by comparing your responses to the labels in the dataset
+
+def get_accuracy(response, dataset, original_indices):
+    correct = 0
+    total = 0
+
+    for entry_number, prediction in response.items():
+        if int(entry_number) not in original_indices:
+            continue
+
+        label_id = dataset[int(entry_number)]["label"]
+        label = id2label[label_id]
+
+        # If the prediction from the LLM matches the label in the dataset
+        # we increment the number of correct predictions.
+        # (Since LLMs do not always produce the same output, we use the
+        # lower case version of the strings for comparison)
+        if prediction.lower() == label.lower():
+            correct += 1
+
+        # increment the total number of predictions
+        total += 1
+
+    try:
+        accuracy = correct / total
+    except ZeroDivisionError:
+        print("No matching results found!")
+        return
+
+    return round(accuracy, 2)
+
+
+print(f"Accuracy: {get_accuracy(response, dataset, range(7, 15))}")
+
+
+
 
 #Revisit criteria
 
